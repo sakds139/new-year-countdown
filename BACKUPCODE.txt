@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>New Year Countdown</title>
+    <style>
+        body {
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background: linear-gradient(to bottom, #000428, #004e92);
+            color: white;
+            font-family: Arial, sans-serif;
+            overflow: hidden;
+        }
+        #countdown {
+            text-align: center;
+        }
+        #countdown h1 {
+            font-size: 4em;
+            margin-bottom: 20px;
+        }
+        #time {
+            font-size: 3em;
+        }
+        .firework {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+        }
+    </style>
+</head>
+<body>
+    <div id="countdown">
+        <h1>Countdown to New Year</h1>
+        <div id="time"></div>
+    </div>
+    <canvas class="firework"></canvas>
+
+    <script>
+        const countdownElement = document.getElementById('time');
+        const canvas = document.querySelector('.firework');
+        const ctx = canvas.getContext('2d');
+
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+
+        const newYear = new Date();
+        newYear.setHours(23, 59, 50, 0);
+
+        function updateCountdown() {
+            const now = new Date();
+            const diff = newYear - now;
+
+            if (diff <= 0) {
+                countdownElement.innerHTML = '<h1>🎉 Happy New Year 2025 🎉</h1>';
+                clearInterval(countdownInterval);
+                launchFireworks();
+                return;
+            }
+
+            const hours = Math.floor((diff / (1000 * 60 * 60)) % 24);
+            const minutes = Math.floor((diff / (1000 * 60)) % 60);
+            const seconds = Math.floor((diff / 1000) % 60);
+
+            countdownElement.textContent = `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+        }
+
+        const countdownInterval = setInterval(updateCountdown, 1000);
+        updateCountdown();
+
+        // Fireworks animation
+        let particles = [];
+
+        function Particle(x, y, color) {
+            this.x = x;
+            this.y = y;
+            this.color = color;
+            this.size = Math.random() * 2 + 1;
+            this.speedX = Math.random() * 3 - 1.5;
+            this.speedY = Math.random() * 3 - 1.5;
+        }
+
+        Particle.prototype.update = function() {
+            this.x += this.speedX;
+            this.y += this.speedY;
+            this.size *= 0.95;
+        };
+
+        Particle.prototype.draw = function() {
+            ctx.fillStyle = this.color;
+            ctx.beginPath();
+            ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+            ctx.fill();
+        };
+
+        function launchFireworks() {
+            setInterval(() => {
+                const x = Math.random() * canvas.width;
+                const y = Math.random() * canvas.height / 2;
+                const color = `hsl(${Math.random() * 360}, 100%, 50%)`;
+
+                for (let i = 0; i < 100; i++) {
+                    particles.push(new Particle(x, y, color));
+                }
+            }, 500);
+        }
+
+        function animate() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            particles = particles.filter(p => p.size > 0.5);
+            particles.forEach(p => {
+                p.update();
+                p.draw();
+            });
+
+            requestAnimationFrame(animate);
+        }
+
+        animate();
+    </script>
+</body>
+</html>
