@@ -1,1 +1,3 @@
-Hi รบกวน เพิ่ม API Key สำหรับการตรวจสอบยอดเงินจ่าย 
+รบกวน เพิ่ม API Key สำหรับการตรวจสอบยอดเงินจ่าย 
+
+write เพิ่มตัว Getway check Port Webconnect
