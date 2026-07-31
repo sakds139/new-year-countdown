@@ -1,0 +1,33 @@
+{
+  "rooms": [
+    {
+      "id": 1,
+      "roomNumber": "101",
+      "type": "single",
+      "status": "occupied"
+    },
+    {
+      "id": 2,
+      "roomNumber": "102",
+      "type": "double",
+      "status": "available"
+    }
+  ],
+  "tenants": [
+    {
+      "id": 1,
+      "name": "Alex",
+      "roomNumber": "101",
+      "phone": "0812345678",
+      "status": "active"
+    }
+  ],
+  "bills": [
+    {
+      "id": 1,
+      "tenantId": 1,
+      "amount": 1500,
+      "status": "unpaid"
+    }
+  ]
+}

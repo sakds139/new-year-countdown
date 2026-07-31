@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="th">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>ระบบจัดการหอพัก</title>
+    <link rel="stylesheet" href="/styles.css" />
+  </head>
+  <body>
+    <div class="login-screen" id="login-screen">
+      <form id="login-form" class="card login-card">
+        <h2>เข้าสู่ระบบผู้ดูแล</h2>
+        <label>ชื่อผู้ใช้</label>
+        <input type="text" id="username" value="admin" required />
+        <label>รหัสผ่าน</label>
+        <input type="password" id="password" value="admin123" required />
+        <button type="submit">เข้าสู่ระบบ</button>
+        <p id="login-message" class="message"></p>
+      </form>
+    </div>
+
+    <div class="app-shell hidden" id="app-shell">
+      <header class="topbar">
+        <div class="brand-area">
+          <div class="brand-mark" aria-label="โลโก้หอพัก">
+            <svg viewBox="0 0 64 64" role="img" aria-hidden="true">
+              <rect x="8" y="14" width="48" height="36" rx="8" fill="#f59e0b"></rect>
+              <rect x="16" y="24" width="32" height="18" rx="4" fill="#14532d"></rect>
+              <path d="M22 24v-8h20v8" stroke="#fef3c7" stroke-width="4" stroke-linecap="round" fill="none"></path>
+              <path d="M24 42h16" stroke="#fef3c7" stroke-width="4" stroke-linecap="round"></path>
+            </svg>
+          </div>
+          <div>
+            <div class="eyebrow">ระบบบริหารหอพัก</div>
+            <h1>ระบบจัดการหอพัก</h1>
+            <p>จัดการห้องพัก ผู้เช่า และการชำระเงินในที่เดียว พร้อมภาพรวมรายได้แบบเรียลไทม์</p>
+          </div>
+        </div>
+        <div class="topbar-actions">
+          <button id="theme-btn" class="ghost-btn">� ธีมองค์กร</button>
+          <select id="theme-select" class="theme-select" aria-label="เลือกธีม">
+            <option value="classic">Classic</option>
+            <option value="enterprise" selected>Enterprise</option>
+            <option value="midnight">Midnight</option>
+          </select>
+          <button id="sound-btn" class="ghost-btn">🔊 เสียงเตือน: เปิด</button>
+          <button id="email-btn" class="ghost-btn">📧 ส่งอีเมลรายงาน</button>
+          <button id="export-btn" class="ghost-btn">ส่งออก Excel</button>
+          <button id="print-btn" class="ghost-btn">พิมพ์</button>
+          <button id="logout-btn" class="ghost-btn">ออกจากระบบ</button>
+        </div>
+      </header>
+
+      <section class="card highlight-card">
+        <div>
+          <h3>ยินดีต้อนรับสู่ศูนย์ควบคุมหอพัก</h3>
+          <p>ติดตามสถานะห้องและผู้เช่าได้อย่างรวดเร็ว พร้อมดูบิลค้างชำระและประวัติการชำระล่าสุดในหนึ่งหน้าจอ</p>
+        </div>
+        <div class="pill-row">
+          <span class="pill">🛏️ จัดการห้องได้ทันที</span>
+          <span class="pill">👤 ควบคุมผู้เช่าแบบเรียลไทม์</span>
+          <span class="pill">💳 ชำระบิลด้วยคลิกเดียว</span>
+        </div>
+      </section>
+
+      <section class="card operations-card">
+        <div class="module-header">
+          <h2>ภาพรวมการดำเนินงาน</h2>
+          <span id="live-clock" class="muted-text">กำลังโหลดเวลา...</span>
+        </div>
+        <div class="operations-grid">
+          <div class="operations-panel">
+            <div class="progress-row">
+              <div>
+                <h4>อัตราการเข้าพัก</h4>
+                <p id="occupancy-progress-text">0%</p>
+              </div>
+              <div class="progress-track">
+                <div id="occupancy-progress" class="progress-fill"></div>
+              </div>
+            </div>
+            <div class="progress-row">
+              <div>
+                <h4>อัตราการชำระเงิน</h4>
+                <p id="payment-progress-text">0%</p>
+              </div>
+              <div class="progress-track">
+                <div id="payment-progress" class="progress-fill success"></div>
+              </div>
+            </div>
+          </div>
+          <div class="operations-panel">
+            <h4>งานสำคัญวันนี้</h4>
+            <ul id="activity-list" class="activity-list"></ul>
+          </div>
+        </div>
+      </section>
+
+      <section class="view-switch">
+        <button id="overview-tab" class="tab-btn active">ภาพรวมระบบ</button>
+        <button id="report-tab" class="tab-btn">รายงานสรุป</button>
+      </section>
+
+      <section class="card report-panel hidden" id="report-view">
+        <div class="module-header">
+          <h2>รายงานสรุป</h2>
+          <span class="muted-text">สรุปสถานการณ์หอพักในช่วงนี้</span>
+        </div>
+        <div class="report-grid">
+          <div class="report-box">
+            <h4>ห้องทั้งหมด</h4>
+            <p id="report-total-rooms">0</p>
+          </div>
+          <div class="report-box">
+            <h4>ห้องว่าง</h4>
+            <p id="report-available-rooms">0</p>
+          </div>
+          <div class="report-box">
+            <h4>ผู้เช่า</h4>
+            <p id="report-tenant-count">0</p>
+          </div>
+          <div class="report-box">
+            <h4>บิลค้างชำระ</h4>
+            <p id="report-unpaid-count">0</p>
+          </div>
+        </div>
+        <div class="report-note">
+          <p id="report-note-text">ระบบพร้อมรับข้อมูลและแจ้งเตือนเมื่อมีบิลค้างชำระ</p>
+        </div>
+      </section>
+
+      <div id="main-content">
+      <section class="card chart-card">
+        <div class="module-header">
+          <h2>กราฟสถิติ</h2>
+          <span class="muted-text">ภาพรวมสถานะระบบในปัจจุบัน</span>
+        </div>
+        <div id="stats-chart" class="stats-chart"></div>
+      </section>
+
+      <section class="card analytics-card">
+        <div class="module-header">
+          <h2>กราฟรายได้แบบละเอียด</h2>
+          <span class="muted-text">ติดตามรายได้รายเดือนแบบเห็นภาพและเข้าใจง่าย</span>
+        </div>
+        <div class="analytics-grid">
+          <div class="analytics-panel">
+            <div class="legend-row">
+              <span class="legend-dot accent"></span>
+              <span>รายได้ที่ชำระแล้ว</span>
+            </div>
+            <svg id="revenue-chart" class="revenue-chart" viewBox="0 0 620 250" preserveAspectRatio="xMidYMid meet"></svg>
+          </div>
+          <div class="analytics-panel">
+            <div class="module-header compact">
+              <h3>สรุปประจำวัน/เดือน</h3>
+            </div>
+            <div class="table-wrap">
+              <table class="summary-table">
+                <thead>
+                  <tr><th>ช่วงเวลา</th><th>รายได้</th><th>ชำระแล้ว</th><th>ค้างชำระ</th></tr>
+                </thead>
+                <tbody id="daily-summary-body"></tbody>
+              </table>
+            </div>
+            <div class="table-wrap top-gap">
+              <table class="summary-table compact-table">
+                <thead>
+                  <tr><th>เดือน</th><th>รายได้</th><th>บิล</th></tr>
+                </thead>
+                <tbody id="monthly-summary-body"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="card chart-card">
+        <div class="module-header">
+          <h2>รายได้ต่อเดือน</h2>
+          <span class="muted-text">สรุปรายได้ที่ชำระแล้วในช่วง 6 เดือนล่าสุด</span>
+        </div>
+        <div id="monthly-chart" class="monthly-chart"></div>
+      </section>
+
+      <section class="card history-card">
+        <div class="module-header">
+          <h2>ประวัติการชำระเงิน</h2>
+          <span class="muted-text">รายการชำระที่สำเร็จแล้ว</span>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr><th>ผู้เช่า</th><th>จำนวนเงิน</th><th>วันที่</th></tr>
+            </thead>
+            <tbody id="history-list"></tbody>
+          </table>
+        </div>
+      </section>
+
+      <section class="cards">
+        <div class="card stat-card">
+          <h3>จำนวนห้องทั้งหมด</h3>
+          <p id="rooms">0</p>
+        </div>
+        <div class="card stat-card">
+          <h3>จำนวนผู้เช่า</h3>
+          <p id="occupants">0</p>
+        </div>
+        <div class="card stat-card">
+          <h3>บิลค้างชำระ</h3>
+          <p id="unpaid">0</p>
+        </div>
+        <div class="card stat-card">
+          <h3>รายได้</h3>
+          <p id="revenue">0</p>
+        </div>
+      </section>
+
+      <section class="card dashboard-card">
+        <h2>ภาพรวมระบบ</h2>
+        <div class="dashboard-grid">
+          <div>
+            <h3>รายการชำระล่าสุด</h3>
+            <ul id="recent-bills"></ul>
+          </div>
+          <div>
+            <h3>คำแนะนำด่วน</h3>
+            <ul>
+              <li>ใช้ค้นหาจากห้องหรือผู้เช่าได้ทันที</li>
+              <li>ชำระบิลได้ด้วยคลิกเดียวจากตารางบิล</li>
+              <li>อัปเดตสถานะห้องหลังจากย้ายผู้เช่า</li>
+            </ul>
+          </div>
+        </div>
+      </section>
+
+      <section class="card module-card">
+        <div class="module-header">
+          <h2>จัดการห้องพัก</h2>
+          <button id="room-reset-btn" class="ghost-btn">ล้าง</button>
+        </div>
+        <div class="search-row">
+          <input id="room-search" placeholder="ค้นหาห้องพัก" />
+        </div>
+        <form id="room-form" class="form-grid">
+          <input type="hidden" id="room-id" />
+          <input type="text" id="room-number" placeholder="หมายเลขห้อง" required />
+          <select id="room-type">
+            <option value="single">เดี่ยว</option>
+            <option value="double">คู่</option>
+            <option value="suite">สวีท</option>
+          </select>
+          <select id="room-status">
+            <option value="available">ว่าง</option>
+            <option value="occupied">มีผู้เช่า</option>
+            <option value="maintenance">ซ่อมบำรุง</option>
+          </select>
+          <button type="submit">บันทึกห้อง</button>
+        </form>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr><th>ห้อง</th><th>ประเภท</th><th>สถานะ</th><th>จัดการ</th></tr>
+            </thead>
+            <tbody id="room-list"></tbody>
+          </table>
+        </div>
+      </section>
+
+      <section class="card module-card">
+        <div class="module-header">
+          <h2>จัดการผู้เช่า</h2>
+          <button id="tenant-reset-btn" class="ghost-btn">ล้าง</button>
+        </div>
+        <div class="search-row">
+          <input id="tenant-search" placeholder="ค้นหาผู้เช่า" />
+        </div>
+        <form id="tenant-form" class="form-grid">
+          <input type="hidden" id="tenant-id" />
+          <input type="text" id="tenant-name" placeholder="ชื่อผู้เช่า" required />
+          <input type="text" id="tenant-room" placeholder="หมายเลขห้อง" required />
+          <input type="text" id="tenant-phone" placeholder="เบอร์โทร" required />
+          <select id="tenant-status">
+            <option value="active">ใช้งาน</option>
+            <option value="inactive">ไม่ใช้งาน</option>
+          </select>
+          <button type="submit">บันทึกผู้เช่า</button>
+        </form>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr><th>ชื่อ</th><th>ห้อง</th><th>เบอร์โทร</th><th>สถานะ</th><th>จัดการ</th></tr>
+            </thead>
+            <tbody id="tenant-list"></tbody>
+          </table>
+        </div>
+      </section>
+
+      <section class="card module-card">
+        <div class="module-header">
+          <h2>บิลและชำระเงิน</h2>
+          <button id="bill-reset-btn" class="ghost-btn">ล้าง</button>
+        </div>
+        <div class="payment-quick-actions">
+          <select id="confirm-bill-select">
+            <option value="">เลือกบิลเพื่อยืนยันชำระ</option>
+          </select>
+          <button id="confirm-payment-btn" type="button">ยืนยันชำระ</button>
+        </div>
+        <div class="search-row">
+          <input id="bill-search" placeholder="ค้นหาบิล" />
+        </div>
+        <form id="bill-form" class="form-grid">
+          <input type="hidden" id="bill-id" />
+          <select id="bill-tenant">
+            <option value="">เลือกผู้เช่า</option>
+          </select>
+          <input type="number" id="bill-amount" placeholder="จำนวนเงิน" required />
+          <select id="bill-status">
+            <option value="unpaid">ค้างชำระ</option>
+            <option value="paid">ชำระแล้ว</option>
+          </select>
+          <button type="submit">บันทึกบิล</button>
+        </form>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr><th>ผู้เช่า</th><th>จำนวนเงิน</th><th>สถานะ</th><th>จัดการ</th></tr>
+            </thead>
+            <tbody id="bill-list"></tbody>
+          </table>
+        </div>
+      </section>
+      </div>
+    </div>
+
+    <script src="/app.js"></script>
+  </body>
+</html>
